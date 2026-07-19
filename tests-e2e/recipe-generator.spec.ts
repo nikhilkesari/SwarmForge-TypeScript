@@ -25,20 +25,20 @@ test.describe('Indian Recipe Generator UI', () => {
     await expect(recipeItems.nth(1)).toContainText('Palak Paneer');
 
     // 7. Toggle filter to "Veg" and verify filtered list
-    await page.selectOption('#diet-filter', 'Veg');
+    await page.click('.diet-toggle-btn[data-diet="Veg"]');
     await expect(recipeItems).toHaveCount(2);
     await expect(recipeItems.nth(0)).toContainText('Palak Paneer');
     await expect(recipeItems.nth(1)).toContainText('Paneer Tikka');
 
     // 8. Toggle filter to "Non-Veg" and verify filtered list
-    await page.selectOption('#diet-filter', 'Non-Veg');
+    await page.click('.diet-toggle-btn[data-diet="Non-Veg"]');
     await expect(recipeItems).toHaveCount(3);
     await expect(recipeItems.nth(0)).toContainText('Butter Chicken');
     await expect(recipeItems.nth(1)).toContainText('Chicken Biryani');
     await expect(recipeItems.nth(2)).toContainText('Chicken Curry');
 
     // 9. Toggle filter back to "All" and verify list is fully restored
-    await page.selectOption('#diet-filter', 'All');
+    await page.click('.diet-toggle-btn[data-diet="All"]');
     await expect(recipeItems).toHaveCount(5);
 
     // 10. Click the "Get Recipe" button for a recipe

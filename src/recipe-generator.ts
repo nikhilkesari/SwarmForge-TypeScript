@@ -117,19 +117,17 @@ export class IndianRecipeGeneratorApp {
             </div>
           </form>
 
+          <div class="diet-toggle-container">
+            <button type="button" class="diet-toggle-btn active" data-diet="All">All</button>
+            <button type="button" class="diet-toggle-btn" data-diet="Veg">Veg Only</button>
+            <button type="button" class="diet-toggle-btn" data-diet="Non-Veg">Non-Veg Only</button>
+          </div>
+
           <div id="status-message" class="status-message" style="display: none;"></div>
 
           <div id="results-section" style="display: none;">
             <div class="results-header">
               <h2>Your Recipes</h2>
-              <div class="filter-wrapper">
-                <label for="diet-filter">Diet:</label>
-                <select id="diet-filter">
-                  <option value="All">All Diets</option>
-                  <option value="Veg">Vegetarian</option>
-                  <option value="Non-Veg">Non-Vegetarian</option>
-                </select>
-              </div>
             </div>
             <ul id="recipes-list"></ul>
           </div>
@@ -152,15 +150,15 @@ export class IndianRecipeGeneratorApp {
     const detailsSection = this.container.querySelector('#recipe-details-section') as HTMLElement;
     const detailsTitle = this.container.querySelector('#recipe-details-title') as HTMLElement;
     const detailsContent = this.container.querySelector('#recipe-details-content') as HTMLElement;
-    const dietFilter = this.container.querySelector('#diet-filter') as HTMLSelectElement;
+    const toggleBtns = this.container.querySelectorAll('.diet-toggle-btn');
+    let currentFilter = 'All';
 
     const renderRecipes = () => {
       recipesList.innerHTML = '';
-      const filterValue = dietFilter.value;
       
       const filtered = this.currentRecipes.filter(recipe => {
-        if (filterValue === 'Veg') return isVegRecipe(recipe);
-        if (filterValue === 'Non-Veg') return !isVegRecipe(recipe);
+        if (currentFilter === 'Veg') return isVegRecipe(recipe);
+        if (currentFilter === 'Non-Veg') return !isVegRecipe(recipe);
         return true;
       });
 
@@ -195,8 +193,14 @@ export class IndianRecipeGeneratorApp {
       });
     };
 
-    dietFilter.addEventListener('change', () => {
-      renderRecipes();
+    toggleBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        toggleBtns.forEach(b => b.classList.remove('active'));
+        const target = e.currentTarget as HTMLButtonElement;
+        target.classList.add('active');
+        currentFilter = target.getAttribute('data-diet') || 'All';
+        renderRecipes();
+      });
     });
 
     form.addEventListener('submit', async (e) => {
@@ -216,7 +220,14 @@ export class IndianRecipeGeneratorApp {
 
       try {
         this.currentRecipes = await this.service.getRecipes(query);
-        dietFilter.value = 'All'; // Reset filter on new search
+        currentFilter = 'All'; // Reset filter on new search
+        toggleBtns.forEach(b => {
+          if (b.getAttribute('data-diet') === 'All') {
+            b.classList.add('active');
+          } else {
+            b.classList.remove('active');
+          }
+        });
         
         statusMsg.style.display = 'none';
         resultsSection.style.display = 'block';

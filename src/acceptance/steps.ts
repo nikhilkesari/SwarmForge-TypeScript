@@ -108,10 +108,9 @@ export function registerSteps(runtime: AcceptanceRuntime) {
 
   runtime.defineStep(/^the user toggles the dietary filter to <([A-Za-z0-9_]+)>$/, (world, example, paramName) => {
     const diet = example[paramName].replace(/^"|"$/g, '');
-    const select = world.container.querySelector('#diet-filter') as HTMLSelectElement;
-    expect(select).toBeDefined();
-    select.value = diet;
-    select.dispatchEvent(new Event('change', { bubbles: true }));
+    const btn = world.container.querySelector(`.diet-toggle-btn[data-diet="${diet}"]`) as HTMLButtonElement;
+    expect(btn).toBeDefined();
+    btn.click();
   });
 
   runtime.defineStep(/^the application displays the filtered recipes: <([A-Za-z0-9_]+)>$/, (world, example, paramName) => {
