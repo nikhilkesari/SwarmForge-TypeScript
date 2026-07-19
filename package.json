@@ -11,7 +11,8 @@
     "test:acceptance": "ts-node-esm scripts/run-acceptance.ts",
     "test:e2e": "playwright test",
     "test:property": "vitest run -c vite.config.property.ts",
-    "test:dry": "jscpd src"
+    "test:dry": "jscpd src",
+    "test:mutation": "stryker run"
   },
   "dependencies": {
     "@google/genai": "^0.2.0"
