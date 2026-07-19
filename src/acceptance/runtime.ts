@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 
 export interface Step {
   keyword: string;

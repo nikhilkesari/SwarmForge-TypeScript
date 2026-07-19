@@ -1,6 +1,7 @@
 import './index.css';
 import { IndianRecipeGeneratorApp } from './recipe-generator';
-import { GeminiRecipeService, MockRecipeService } from './recipe-service';
+import { GeminiRecipeService } from './recipe-service';
+import { MockRecipeService } from './mock-recipe-service';
 
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY || localStorage.getItem('GEMINI_API_KEY');
 const model = import.meta.env.VITE_GEMINI_MODEL || 'gemini-3.5-flash';

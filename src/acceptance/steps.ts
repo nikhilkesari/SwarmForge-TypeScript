@@ -1,7 +1,8 @@
 import { expect } from 'vitest';
 import { AcceptanceRuntime } from './runtime';
 import { IndianRecipeGeneratorApp } from '../recipe-generator';
-import { MockRecipeService, RecipeService } from '../recipe-service';
+import { RecipeService } from '../recipe-service';
+import { MockRecipeService } from '../mock-recipe-service';
 
 export function registerSteps(runtime: AcceptanceRuntime) {
   runtime.defineStep('the Indian Recipe Generator application is loaded', (world) => {
@@ -105,5 +106,29 @@ export function registerSteps(runtime: AcceptanceRuntime) {
     const expectedDetails = example[paramName].replace(/^"|"$/g, '');
     const content = world.container.querySelector('#recipe-details-content') as HTMLElement;
     expect(content.textContent).toBe(expectedDetails);
+  });
+
+  runtime.defineStep(/^the user toggles the dietary filter to <([A-Za-z0-9_]+)>$/, (world, example, paramName) => {
+    const diet = example[paramName].replace(/^"|"$/g, '');
+    const btn = world.container.querySelector(`.diet-toggle-btn[data-diet="${diet}"]`) as HTMLButtonElement;
+    expect(btn).toBeDefined();
+    btn.click();
+  });
+
+  runtime.defineStep(/^the application displays the filtered recipes: <([A-Za-z0-9_]+)>$/, (world, example, paramName) => {
+    const rawFiltered = example[paramName];
+    const expectedList = rawFiltered
+      .replace(/^"|"$/g, '')
+      .split(',')
+      .map(r => r.trim())
+      .filter(r => r.length > 0);
+
+    const recipeItems = world.container.querySelectorAll('#recipes-list .recipe-item .recipe-name');
+    const actualList: string[] = [];
+    recipeItems.forEach((item: any) => {
+      actualList.push(item.textContent.trim());
+    });
+
+    expect(actualList).toEqual(expectedList);
   });
 }

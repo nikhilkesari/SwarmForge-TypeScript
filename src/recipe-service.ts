@@ -15,6 +15,12 @@ export function parseAndValidateRecipes(text: string): string[] {
   throw new Error('Invalid response structure from Gemini API');
 }
 
+export function isVegRecipe(name: string): boolean {
+  const lower = name.toLowerCase();
+  const nonVegKeywords = ['chicken', 'murgh', 'mutton', 'lamb', 'fish', 'prawn', 'shrimp', 'egg', 'beef', 'pork', 'meat'];
+  return !nonVegKeywords.some(keyword => lower.includes(keyword));
+}
+
 export class GeminiRecipeService implements RecipeService {
   private ai: GoogleGenAI;
   private model: string;
@@ -49,26 +55,4 @@ export class GeminiRecipeService implements RecipeService {
   }
 }
 
-// A mock service for testing, and as a fallback if no API key is provided
-export class MockRecipeService implements RecipeService {
-  async getRecipes(query: string): Promise<string[]> {
-    if (query === 'paneer, spinach') {
-      return ['Palak Paneer', 'Paneer Tikka', 'Paneer Bhurji', 'Kadai Paneer', 'Matar Paneer'];
-    }
-    if (query === 'potato, cumin') {
-      return ['Aloo Jeera', 'Aloo Gobi', 'Aloo Paratha', 'Dum Aloo', 'Aloo Methi'];
-    }
-    // Fallback Indian recipes
-    return ['Butter Chicken', 'Chana Masala', 'Biryani', 'Dal Makhani', 'Samosa'];
-  }
 
-  async getRecipeDetails(recipeName: string): Promise<string> {
-    if (recipeName === 'Palak Paneer') {
-      return "Ingredients: Paneer, Spinach, Spices. Instructions: Cook spinach, add paneer cubes, and simmer.";
-    }
-    if (recipeName === 'Aloo Jeera') {
-      return "Ingredients: Potatoes, Cumin, Spices. Instructions: Boil potatoes, temper cumin, toss, and serve hot.";
-    }
-    return `Ingredients and instructions for mock ${recipeName}`;
-  }
-}
