@@ -1,5 +1,6 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest';
-import { IndianRecipeGeneratorApp, MockRecipeService, GeminiRecipeService, parseAndValidateRecipes } from './recipe-generator';
+import { IndianRecipeGeneratorApp } from './recipe-generator';
+import { MockRecipeService, GeminiRecipeService, parseAndValidateRecipes } from './recipe-service';
 import { GoogleGenAI } from '@google/genai';
 
 vi.mock('@google/genai', () => {
