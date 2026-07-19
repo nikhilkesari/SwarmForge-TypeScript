@@ -19,7 +19,7 @@ export class GeminiRecipeService implements RecipeService {
   private ai: GoogleGenAI;
   private model: string;
 
-  constructor(apiKey: string, model: string = 'gemini-2.0-flash') {
+  constructor(apiKey: string, model: string = 'gemini-3.5-flash') {
     this.ai = new GoogleGenAI({ apiKey });
     this.model = model;
   }

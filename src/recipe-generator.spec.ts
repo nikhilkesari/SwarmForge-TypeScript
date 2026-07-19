@@ -77,7 +77,7 @@ describe('GeminiRecipeService', () => {
 
     const result = await service.getRecipes('paneer');
     expect(clientInstance.models.generateContent).toHaveBeenCalledWith({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.5-flash',
       contents: expect.stringContaining('paneer'),
     });
     expect(result).toEqual(['Chole Bhature', 'Paneer Tikka']);
