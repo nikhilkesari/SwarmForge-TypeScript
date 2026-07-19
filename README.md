@@ -1,4 +1,4 @@
-# Indian Recipe Generator & SwarmForge Workspace 🍲🤖
+# Generator & SwarmForge Workspace 🍲🤖
 
 An AI-powered web application that generates authentic Indian recipes based on ingredients and dietary preferences, serving as a playground for the **SwarmForge multi-agent development workflow**.
 
