@@ -2,7 +2,26 @@ import { RecipeService } from './recipe-service';
 
 // A mock service for testing, and as a fallback if no API key is provided
 export class MockRecipeService implements RecipeService {
-  async getRecipes(query: string): Promise<string[]> {
+  async getRecipes(query: string, diet?: string): Promise<string[]> {
+    if (diet === 'Veg') {
+      if (query === 'chicken') {
+        return [];
+      }
+      if (query === 'paneer, spinach' || query === 'paneer, chicken') {
+        return ['Palak Paneer', 'Paneer Tikka', 'Paneer Bhurji', 'Kadai Paneer', 'Matar Paneer'];
+      }
+      return ['Chana Masala', 'Dal Makhani', 'Samosa', 'Aloo Gobi', 'Aloo Jeera'];
+    }
+    if (diet === 'Non-Veg') {
+      if (query === 'potato, cumin') {
+        return [];
+      }
+      if (query === 'chicken' || query === 'paneer, chicken') {
+        return ['Butter Chicken', 'Chicken Biryani', 'Chicken Tikka', 'Chicken Korma', 'Chicken Curry'];
+      }
+      return ['Butter Chicken', 'Biryani', 'Chicken Curry', 'Mutton Rogan Josh', 'Fish Curry'];
+    }
+    // diet === 'All' or undefined
     if (query === 'paneer, spinach') {
       return ['Palak Paneer', 'Paneer Tikka', 'Paneer Bhurji', 'Kadai Paneer', 'Matar Paneer'];
     }

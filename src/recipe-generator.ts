@@ -4,6 +4,7 @@ export class IndianRecipeGeneratorApp {
   private service: RecipeService;
   private container: HTMLElement;
   private currentRecipes: string[] = [];
+  private currentFilter = 'All';
 
   constructor(container: HTMLElement, service: RecipeService) {
     this.container = container;
@@ -35,21 +36,20 @@ export class IndianRecipeGeneratorApp {
             </div>
           </form>
 
+          <div class="diet-toggle-container">
+            <button type="button" class="diet-toggle-btn active" data-diet="All">All</button>
+            <button type="button" class="diet-toggle-btn" data-diet="Veg">Veg Only</button>
+            <button type="button" class="diet-toggle-btn" data-diet="Non-Veg">Non-Veg Only</button>
+          </div>
+
           <div id="status-message" class="status-message" style="display: none;"></div>
 
           <div id="results-section" style="display: none;">
             <div class="results-header">
               <h2>Your Recipes</h2>
-              <div class="filter-wrapper">
-                <label for="diet-filter">Diet:</label>
-                <select id="diet-filter">
-                  <option value="All">All Diets</option>
-                  <option value="Veg">Vegetarian</option>
-                  <option value="Non-Veg">Non-Vegetarian</option>
-                </select>
-              </div>
             </div>
             <ul id="recipes-list"></ul>
+            <div id="filter-empty-message" class="status-message info" style="display: none;"></div>
           </div>
 
           <div id="recipe-details-section" class="status-message info" style="display: none; margin-top: 20px; text-align: left;">
@@ -70,17 +70,25 @@ export class IndianRecipeGeneratorApp {
     const detailsSection = this.container.querySelector('#recipe-details-section') as HTMLElement;
     const detailsTitle = this.container.querySelector('#recipe-details-title') as HTMLElement;
     const detailsContent = this.container.querySelector('#recipe-details-content') as HTMLElement;
-    const dietFilter = this.container.querySelector('#diet-filter') as HTMLSelectElement;
+    const toggleBtns = this.container.querySelectorAll('.diet-toggle-btn');
+    const filterEmptyMsg = this.container.querySelector('#filter-empty-message') as HTMLElement;
 
     const renderRecipes = () => {
       recipesList.innerHTML = '';
-      const filterValue = dietFilter.value;
+      filterEmptyMsg.style.display = 'none';
+      filterEmptyMsg.textContent = '';
       
       const filtered = this.currentRecipes.filter(recipe => {
-        if (filterValue === 'Veg') return isVegRecipe(recipe);
-        if (filterValue === 'Non-Veg') return !isVegRecipe(recipe);
+        if (this.currentFilter === 'Veg') return isVegRecipe(recipe);
+        if (this.currentFilter === 'Non-Veg') return !isVegRecipe(recipe);
         return true;
       });
+
+      if (filtered.length === 0) {
+        const displayFilter = this.currentFilter === 'All' ? 'All' : `${this.currentFilter} Only`;
+        filterEmptyMsg.textContent = `No recipes matching ${displayFilter} found.`;
+        filterEmptyMsg.style.display = 'block';
+      }
 
       filtered.forEach((recipe, idx) => {
         const li = document.createElement('li');
@@ -113,12 +121,7 @@ export class IndianRecipeGeneratorApp {
       });
     };
 
-    dietFilter.addEventListener('change', () => {
-      renderRecipes();
-    });
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    const handleFetch = async () => {
       const query = input.value.trim();
       if (!query) return;
 
@@ -133,8 +136,8 @@ export class IndianRecipeGeneratorApp {
       detailsSection.style.display = 'none';
 
       try {
-        this.currentRecipes = await this.service.getRecipes(query);
-        dietFilter.value = 'All'; // Reset filter on new search
+        this.currentRecipes = await this.service.getRecipes(query, this.currentFilter);
+        this.lastSubmittedQuery = query;
         
         statusMsg.style.display = 'none';
         resultsSection.style.display = 'block';
@@ -147,6 +150,29 @@ export class IndianRecipeGeneratorApp {
         submitBtn.disabled = false;
         buttonLoader.style.display = 'none';
       }
+    };
+
+    toggleBtns.forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        toggleBtns.forEach(b => b.classList.remove('active'));
+        const target = e.currentTarget as HTMLButtonElement;
+        target.classList.add('active');
+        this.currentFilter = target.getAttribute('data-diet') || 'All';
+        const query = input.value.trim();
+
+        if (query) {
+          await handleFetch();
+        } else {
+          renderRecipes();
+        }
+      });
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await handleFetch();
     });
   }
+
+  private lastSubmittedQuery = '';
 }

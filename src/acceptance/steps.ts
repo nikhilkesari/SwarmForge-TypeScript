@@ -18,10 +18,11 @@ export function registerSteps(runtime: AcceptanceRuntime) {
     // Track calls/mock
     const mockService = new MockRecipeService();
     const serviceWrapper: RecipeService = {
-      getRecipes: async (query: string) => {
+      getRecipes: async (query: string, diet?: string) => {
         world.calledService = true;
         world.serviceQuery = query;
-        return mockService.getRecipes(query);
+        world.serviceDiet = diet;
+        return mockService.getRecipes(query, diet);
       },
       getRecipeDetails: async (recipeName: string) => {
         world.calledDetails = true;
@@ -34,6 +35,14 @@ export function registerSteps(runtime: AcceptanceRuntime) {
     app.init();
 
     world.container = container;
+  });
+
+  runtime.defineStep(/^the user enters the search query "([^"]*)"$/, (world, _example, val) => {
+    const input = world.container.querySelector('#search-input') as HTMLInputElement;
+    expect(input).toBeDefined();
+    input.value = val;
+    // Dispatch input event to simulate typing
+    input.dispatchEvent(new Event('input', { bubbles: true }));
   });
 
   runtime.defineStep(/^the user enters the search query <([A-Za-z0-9_]+)>$/, (world, example, paramName) => {
@@ -61,6 +70,36 @@ export function registerSteps(runtime: AcceptanceRuntime) {
 
   runtime.defineStep('the application calls the Google Gen AI SDK to fetch recipes', (world) => {
     expect(world.calledService).toBe(true);
+  });
+
+  runtime.defineStep(/^the application calls the recipe service for "([^"]*)" recipes with "([^"]*)"$/, (world, _example, diet, query) => {
+    expect(world.calledService).toBe(true);
+    expect(world.serviceQuery).toBe(query);
+    expect(world.serviceDiet).toBe(diet);
+  });
+
+  runtime.defineStep(/^the application calls the recipe service for <([A-Za-z0-9_]+)> recipes with <([A-Za-z0-9_]+)>$/, (world, example, dietParam, queryParam) => {
+    expect(world.calledService).toBe(true);
+    const diet = example[dietParam].replace(/^"|"$/g, '');
+    const query = example[queryParam].replace(/^"|"$/g, '');
+    expect(world.serviceQuery).toBe(query);
+    expect(world.serviceDiet).toBe(diet);
+  });
+
+  runtime.defineStep(/^the application displays exactly 5 recipes: "([^"]*)"$/, (world, _example, rawRecipes) => {
+    const expectedList = rawRecipes
+      .split(',')
+      .map(r => r.trim());
+
+    const recipeItems = world.container.querySelectorAll('#recipes-list .recipe-item .recipe-name');
+    expect(recipeItems.length).toBe(5);
+
+    const actualList: string[] = [];
+    recipeItems.forEach((item: any) => {
+      actualList.push(item.textContent.trim());
+    });
+
+    expect(actualList).toEqual(expectedList);
   });
 
   runtime.defineStep(/^the application displays exactly 5 recipes: <([A-Za-z0-9_]+)>$/, (world, example, paramName) => {
@@ -108,11 +147,21 @@ export function registerSteps(runtime: AcceptanceRuntime) {
     expect(content.textContent).toBe(expectedDetails);
   });
 
-  runtime.defineStep(/^the user toggles the dietary filter to <([A-Za-z0-9_]+)>$/, (world, example, paramName) => {
+  runtime.defineStep(/^the user toggles the dietary filter to "([^"]*)"$/, async (world, _example, diet) => {
+    const btn = world.container.querySelector(`.diet-toggle-btn[data-diet="${diet}"]`) as HTMLButtonElement;
+    expect(btn).toBeDefined();
+    btn.click();
+    // Wait for auto fetch if it happens
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  });
+
+  runtime.defineStep(/^the user toggles the dietary filter to <([A-Za-z0-9_]+)>$/, async (world, example, paramName) => {
     const diet = example[paramName].replace(/^"|"$/g, '');
     const btn = world.container.querySelector(`.diet-toggle-btn[data-diet="${diet}"]`) as HTMLButtonElement;
     expect(btn).toBeDefined();
     btn.click();
+    // Wait for auto fetch if it happens
+    await new Promise((resolve) => setTimeout(resolve, 100));
   });
 
   runtime.defineStep(/^the application displays the filtered recipes: <([A-Za-z0-9_]+)>$/, (world, example, paramName) => {
@@ -130,5 +179,30 @@ export function registerSteps(runtime: AcceptanceRuntime) {
     });
 
     expect(actualList).toEqual(expectedList);
+  });
+
+  runtime.defineStep(/^the active dietary filter remains "([^"]*)"$/, (world, _example, diet) => {
+    const activeBtn = world.container.querySelector('.diet-toggle-btn.active') as HTMLButtonElement;
+    expect(activeBtn).toBeDefined();
+    expect(activeBtn.getAttribute('data-diet')).toBe(diet);
+  });
+
+  runtime.defineStep(/^the active dietary filter remains <([A-Za-z0-9_]+)>$/, (world, example, paramName) => {
+    const diet = example[paramName].replace(/^"|"$/g, '');
+    const activeBtn = world.container.querySelector('.diet-toggle-btn.active') as HTMLButtonElement;
+    expect(activeBtn).toBeDefined();
+    expect(activeBtn.getAttribute('data-diet')).toBe(diet);
+  });
+
+  runtime.defineStep(/^the application displays the filter empty message <([A-Za-z0-9_]+)>$/, (world, example, paramName) => {
+    const message = example[paramName].replace(/^"|"$/g, '');
+    const emptyMsg = world.container.querySelector('#filter-empty-message') as HTMLElement;
+    expect(emptyMsg.style.display).toBe('block');
+    expect(emptyMsg.textContent).toBe(message);
+  });
+
+  runtime.defineStep('the application displays no recipes', (world) => {
+    const recipeItems = world.container.querySelectorAll('#recipes-list .recipe-item');
+    expect(recipeItems.length).toBe(0);
   });
 }

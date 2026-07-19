@@ -246,38 +246,37 @@ describe('IndianRecipeGeneratorApp', () => {
     let items = container.querySelectorAll('#recipes-list .recipe-item .recipe-name');
     expect(items.length).toBe(5);
 
-    // Toggle filter to Veg (using a dropdown or radio button or input/event)
-    // Let's implement it with a select dropdown or filter buttons. Let's select "Veg" filter option or radio.
-    // Let's assume we have a select element with id "diet-filter" or buttons with class "filter-btn" or similar.
-    // In Gherkin: "When the user toggles the dietary filter to Veg"
-    // Let's support an input[name="diet-filter"] or select #diet-filter. A select element is standard and clean.
-    const select = container.querySelector('#diet-filter') as HTMLSelectElement;
+    // Toggle filter to Veg (using toggle buttons)
+    // Gherkin scenario: "Filter already generated recipes dynamically"
+    // The filter buttons are toggled.
+    const select = container.querySelector('.diet-toggle-btn[data-diet="Veg"]') as HTMLButtonElement;
     expect(select).toBeDefined();
     
-    // Change to Veg
-    select.value = 'Veg';
-    select.dispatchEvent(new Event('change', { bubbles: true }));
+    // Change to Veg (without search query present, or mocking service responses)
+    // In unit test context, let's just test UI logic by changing filter and checking rendered list
+    // Note that since input.value is cleared or not, clicking the toggle triggers handleFetch.
+    // If we want to test pure local filtering in unit test, we should clear input first.
+    input.value = '';
+    select.click();
 
     items = container.querySelectorAll('#recipes-list .recipe-item .recipe-name');
-    // For 'paneer, chicken', Veg recipes are: Palak Paneer, Paneer Tikka
     expect(items.length).toBe(2);
     expect(items[0].textContent).toBe('Palak Paneer');
     expect(items[1].textContent).toBe('Paneer Tikka');
 
     // Change to Non-Veg
-    select.value = 'Non-Veg';
-    select.dispatchEvent(new Event('change', { bubbles: true }));
+    const selectNonVeg = container.querySelector('.diet-toggle-btn[data-diet="Non-Veg"]') as HTMLButtonElement;
+    selectNonVeg.click();
 
     items = container.querySelectorAll('#recipes-list .recipe-item .recipe-name');
-    // Non-Veg recipes: Butter Chicken, Chicken Biryani, Chicken Curry
     expect(items.length).toBe(3);
     expect(items[0].textContent).toBe('Butter Chicken');
     expect(items[1].textContent).toBe('Chicken Biryani');
     expect(items[2].textContent).toBe('Chicken Curry');
 
     // Change back to All
-    select.value = 'All';
-    select.dispatchEvent(new Event('change', { bubbles: true }));
+    const selectAll = container.querySelector('.diet-toggle-btn[data-diet="All"]') as HTMLButtonElement;
+    selectAll.click();
 
     items = container.querySelectorAll('#recipes-list .recipe-item .recipe-name');
     expect(items.length).toBe(5);

@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 
 export interface RecipeService {
-  getRecipes(query: string): Promise<string[]>;
+  getRecipes(query: string, diet?: string): Promise<string[]>;
   getRecipeDetails(recipeName: string): Promise<string>;
 }
 
@@ -43,8 +43,14 @@ export class GeminiRecipeService implements RecipeService {
     }
   }
 
-  async getRecipes(query: string): Promise<string[]> {
-    const prompt = `Generate exactly 5 authentic Indian recipe names (and only the names) that use or are related to: "${query}". Return the names as a JSON array of strings, for example: ["Aloo Jeera", "Aloo Gobi", "Aloo Paratha", "Dum Aloo", "Aloo Methi"]. Do not include backticks, markdown formatting, or any extra text.`;
+  async getRecipes(query: string, diet?: string): Promise<string[]> {
+    let dietDescription = '';
+    if (diet === 'Veg') {
+      dietDescription = ' vegetarian';
+    } else if (diet === 'Non-Veg') {
+      dietDescription = ' non-vegetarian';
+    }
+    const prompt = `Generate exactly 5 authentic Indian${dietDescription} recipe names (and only the names) that use or are related to: "${query}". Return the names as a JSON array of strings, for example: ["Aloo Jeera", "Aloo Gobi", "Aloo Paratha", "Dum Aloo", "Aloo Methi"]. Do not include backticks, markdown formatting, or any extra text.`;
     const text = await this.generate(prompt);
     return parseAndValidateRecipes(text);
   }
