@@ -1,38 +1,29 @@
 import { RecipeService } from './recipe-service';
 
+const MOCK_RECIPES: Record<string, string[]> = {
+  'Veg:paneer, spinach': ['Palak Paneer', 'Paneer Tikka', 'Paneer Bhurji', 'Kadai Paneer', 'Matar Paneer'],
+  'Veg:paneer, chicken': ['Palak Paneer', 'Paneer Tikka', 'Paneer Bhurji', 'Kadai Paneer', 'Matar Paneer'],
+  'Veg:chicken': [],
+  'Veg:default': ['Chana Masala', 'Dal Makhani', 'Samosa', 'Aloo Gobi', 'Aloo Jeera'],
+  'Non-Veg:chicken': ['Butter Chicken', 'Chicken Biryani', 'Chicken Tikka', 'Chicken Korma', 'Chicken Curry'],
+  'Non-Veg:paneer, chicken': ['Butter Chicken', 'Chicken Biryani', 'Chicken Tikka', 'Chicken Korma', 'Chicken Curry'],
+  'Non-Veg:potato, cumin': [],
+  'Non-Veg:default': ['Butter Chicken', 'Biryani', 'Chicken Curry', 'Mutton Rogan Josh', 'Fish Curry'],
+  'All:paneer, spinach': ['Palak Paneer', 'Paneer Tikka', 'Paneer Bhurji', 'Kadai Paneer', 'Matar Paneer'],
+  'All:potato, cumin': ['Aloo Jeera', 'Aloo Gobi', 'Aloo Paratha', 'Dum Aloo', 'Aloo Methi'],
+  'All:paneer, chicken': ['Butter Chicken', 'Palak Paneer', 'Chicken Biryani', 'Paneer Tikka', 'Chicken Curry'],
+  'All:default': ['Butter Chicken', 'Chana Masala', 'Biryani', 'Dal Makhani', 'Samosa']
+};
+
 // A mock service for testing, and as a fallback if no API key is provided
 export class MockRecipeService implements RecipeService {
-  async getRecipes(query: string, diet?: string): Promise<string[]> {
-    if (diet === 'Veg') {
-      if (query === 'chicken') {
-        return [];
-      }
-      if (query === 'paneer, spinach' || query === 'paneer, chicken') {
-        return ['Palak Paneer', 'Paneer Tikka', 'Paneer Bhurji', 'Kadai Paneer', 'Matar Paneer'];
-      }
-      return ['Chana Masala', 'Dal Makhani', 'Samosa', 'Aloo Gobi', 'Aloo Jeera'];
+  async getRecipes(query: string, diet: string = 'All'): Promise<string[]> {
+    const key = `${diet}:${query}`;
+    if (key in MOCK_RECIPES) {
+      return MOCK_RECIPES[key];
     }
-    if (diet === 'Non-Veg') {
-      if (query === 'potato, cumin') {
-        return [];
-      }
-      if (query === 'chicken' || query === 'paneer, chicken') {
-        return ['Butter Chicken', 'Chicken Biryani', 'Chicken Tikka', 'Chicken Korma', 'Chicken Curry'];
-      }
-      return ['Butter Chicken', 'Biryani', 'Chicken Curry', 'Mutton Rogan Josh', 'Fish Curry'];
-    }
-    // diet === 'All' or undefined
-    if (query === 'paneer, spinach') {
-      return ['Palak Paneer', 'Paneer Tikka', 'Paneer Bhurji', 'Kadai Paneer', 'Matar Paneer'];
-    }
-    if (query === 'potato, cumin') {
-      return ['Aloo Jeera', 'Aloo Gobi', 'Aloo Paratha', 'Dum Aloo', 'Aloo Methi'];
-    }
-    if (query === 'paneer, chicken') {
-      return ['Butter Chicken', 'Palak Paneer', 'Chicken Biryani', 'Paneer Tikka', 'Chicken Curry'];
-    }
-    // Fallback Indian recipes
-    return ['Butter Chicken', 'Chana Masala', 'Biryani', 'Dal Makhani', 'Samosa'];
+    const defaultKey = `${diet}:default`;
+    return MOCK_RECIPES[defaultKey] || MOCK_RECIPES['All:default'];
   }
 
   async getRecipeDetails(recipeName: string): Promise<string> {

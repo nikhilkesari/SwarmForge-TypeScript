@@ -126,9 +126,39 @@ describe('isVegRecipe', () => {
 describe('MockRecipeService', () => {
   const service = new MockRecipeService();
 
-  test('returns paneer and chicken recipes when query is paneer, chicken', async () => {
+  test('returns paneer and chicken recipes when query is paneer, chicken and diet is All', async () => {
     const results = await service.getRecipes('paneer, chicken');
     expect(results).toEqual(['Butter Chicken', 'Palak Paneer', 'Chicken Biryani', 'Paneer Tikka', 'Chicken Curry']);
+  });
+
+  test('diet: Veg, query: chicken returns empty array', async () => {
+    const results = await service.getRecipes('chicken', 'Veg');
+    expect(results).toEqual([]);
+  });
+
+  test('diet: Veg, query: paneer, spinach returns Veg recipes', async () => {
+    const results = await service.getRecipes('paneer, spinach', 'Veg');
+    expect(results).toEqual(['Palak Paneer', 'Paneer Tikka', 'Paneer Bhurji', 'Kadai Paneer', 'Matar Paneer']);
+  });
+
+  test('diet: Veg, query: other returns fallback Veg recipes', async () => {
+    const results = await service.getRecipes('potato, cumin', 'Veg');
+    expect(results).toEqual(['Chana Masala', 'Dal Makhani', 'Samosa', 'Aloo Gobi', 'Aloo Jeera']);
+  });
+
+  test('diet: Non-Veg, query: potato, cumin returns empty array', async () => {
+    const results = await service.getRecipes('potato, cumin', 'Non-Veg');
+    expect(results).toEqual([]);
+  });
+
+  test('diet: Non-Veg, query: chicken returns Non-Veg recipes', async () => {
+    const results = await service.getRecipes('chicken', 'Non-Veg');
+    expect(results).toEqual(['Butter Chicken', 'Chicken Biryani', 'Chicken Tikka', 'Chicken Korma', 'Chicken Curry']);
+  });
+
+  test('diet: Non-Veg, query: other returns fallback Non-Veg recipes', async () => {
+    const results = await service.getRecipes('some-other', 'Non-Veg');
+    expect(results).toEqual(['Butter Chicken', 'Biryani', 'Chicken Curry', 'Mutton Rogan Josh', 'Fish Curry']);
   });
 
   test('returns paneer recipes when query contains paneer', async () => {
@@ -280,5 +310,31 @@ describe('IndianRecipeGeneratorApp', () => {
 
     items = container.querySelectorAll('#recipes-list .recipe-item .recipe-name');
     expect(items.length).toBe(5);
+  });
+
+  describe('MockRecipeService', () => {
+    test('MockRecipeService getRecipes and getRecipeDetails coverage', async () => {
+      const mockService = new MockRecipeService();
+      
+      // Test all getRecipes keys to hit 100% branch coverage
+      expect(await mockService.getRecipes('paneer, spinach', 'Veg')).toEqual(['Palak Paneer', 'Paneer Tikka', 'Paneer Bhurji', 'Kadai Paneer', 'Matar Paneer']);
+      expect(await mockService.getRecipes('chicken', 'Veg')).toEqual([]);
+      expect(await mockService.getRecipes('unknown', 'Veg')).toEqual(['Chana Masala', 'Dal Makhani', 'Samosa', 'Aloo Gobi', 'Aloo Jeera']);
+      
+      expect(await mockService.getRecipes('potato, cumin', 'Non-Veg')).toEqual([]);
+      expect(await mockService.getRecipes('chicken', 'Non-Veg')).toEqual(['Butter Chicken', 'Chicken Biryani', 'Chicken Tikka', 'Chicken Korma', 'Chicken Curry']);
+      expect(await mockService.getRecipes('unknown', 'Non-Veg')).toEqual(['Butter Chicken', 'Biryani', 'Chicken Curry', 'Mutton Rogan Josh', 'Fish Curry']);
+      
+      expect(await mockService.getRecipes('paneer, spinach', 'All')).toEqual(['Palak Paneer', 'Paneer Tikka', 'Paneer Bhurji', 'Kadai Paneer', 'Matar Paneer']);
+      expect(await mockService.getRecipes('potato, cumin', 'All')).toEqual(['Aloo Jeera', 'Aloo Gobi', 'Aloo Paratha', 'Dum Aloo', 'Aloo Methi']);
+      expect(await mockService.getRecipes('paneer, chicken', 'All')).toEqual(['Butter Chicken', 'Palak Paneer', 'Chicken Biryani', 'Paneer Tikka', 'Chicken Curry']);
+      expect(await mockService.getRecipes('unknown', 'All')).toEqual(['Butter Chicken', 'Chana Masala', 'Biryani', 'Dal Makhani', 'Samosa']);
+      expect(await mockService.getRecipes('unknown')).toEqual(['Butter Chicken', 'Chana Masala', 'Biryani', 'Dal Makhani', 'Samosa']);
+
+      // Test getRecipeDetails
+      expect(await mockService.getRecipeDetails('Palak Paneer')).toContain('Paneer, Spinach');
+      expect(await mockService.getRecipeDetails('Aloo Jeera')).toContain('Potatoes, Cumin');
+      expect(await mockService.getRecipeDetails('unknown')).toContain('mock unknown');
+    });
   });
 });
