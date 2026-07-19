@@ -14,11 +14,15 @@ function main() {
 
     // 2. Parse feature files using Babashka gherkin-parser task
     console.log('--- Parsing Gherkin Features ---');
-    runCmd('bb gherkin-parser ../../features/recipe_generator.feature ../../tmp/recipe_generator.json', 'build/aps');
+    const features = fs.readdirSync('features').filter(f => f.endsWith('.feature'));
+    for (const feature of features) {
+      const baseName = feature.replace(/\.feature$/, '');
+      runCmd(`bb gherkin-parser ../../features/${feature} ../../tmp/${baseName}.json`, 'build/aps');
 
-    // 3. Generate test entry points
-    console.log('--- Generating Acceptance Test Entrypoints ---');
-    runCmd('npx ts-node --esm scripts/acceptance-generator.ts tmp/recipe_generator.json src/acceptance');
+      // 3. Generate test entry points
+      console.log(`--- Generating Acceptance Test Entrypoint for ${feature} ---`);
+      runCmd(`npx ts-node --esm scripts/acceptance-generator.ts tmp/${baseName}.json src/acceptance`);
+    }
 
     // 4. Run the generated tests using Vitest
     console.log('--- Running Vitest Acceptance Tests ---');

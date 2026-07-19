@@ -15,6 +15,12 @@ export function parseAndValidateRecipes(text: string): string[] {
   throw new Error('Invalid response structure from Gemini API');
 }
 
+export function isVegRecipe(name: string): boolean {
+  const lower = name.toLowerCase();
+  const nonVegKeywords = ['chicken', 'murgh', 'mutton', 'lamb', 'fish', 'prawn', 'shrimp', 'egg', 'beef', 'pork', 'meat'];
+  return !nonVegKeywords.some(keyword => lower.includes(keyword));
+}
+
 export class GeminiRecipeService implements RecipeService {
   private ai: GoogleGenAI;
   private model: string;
@@ -58,6 +64,9 @@ export class MockRecipeService implements RecipeService {
     if (query === 'potato, cumin') {
       return ['Aloo Jeera', 'Aloo Gobi', 'Aloo Paratha', 'Dum Aloo', 'Aloo Methi'];
     }
+    if (query === 'paneer, chicken') {
+      return ['Butter Chicken', 'Palak Paneer', 'Chicken Biryani', 'Paneer Tikka', 'Chicken Curry'];
+    }
     // Fallback Indian recipes
     return ['Butter Chicken', 'Chana Masala', 'Biryani', 'Dal Makhani', 'Samosa'];
   }
@@ -76,6 +85,7 @@ export class MockRecipeService implements RecipeService {
 export class IndianRecipeGeneratorApp {
   private service: RecipeService;
   private container: HTMLElement;
+  private currentRecipes: string[] = [];
 
   constructor(container: HTMLElement, service: RecipeService) {
     this.container = container;
@@ -110,7 +120,17 @@ export class IndianRecipeGeneratorApp {
           <div id="status-message" class="status-message" style="display: none;"></div>
 
           <div id="results-section" style="display: none;">
-            <h2>Your Recipes</h2>
+            <div class="results-header">
+              <h2>Your Recipes</h2>
+              <div class="filter-wrapper">
+                <label for="diet-filter">Diet:</label>
+                <select id="diet-filter">
+                  <option value="All">All Diets</option>
+                  <option value="Veg">Vegetarian</option>
+                  <option value="Non-Veg">Non-Vegetarian</option>
+                </select>
+              </div>
+            </div>
             <ul id="recipes-list"></ul>
           </div>
 
@@ -132,6 +152,52 @@ export class IndianRecipeGeneratorApp {
     const detailsSection = this.container.querySelector('#recipe-details-section') as HTMLElement;
     const detailsTitle = this.container.querySelector('#recipe-details-title') as HTMLElement;
     const detailsContent = this.container.querySelector('#recipe-details-content') as HTMLElement;
+    const dietFilter = this.container.querySelector('#diet-filter') as HTMLSelectElement;
+
+    const renderRecipes = () => {
+      recipesList.innerHTML = '';
+      const filterValue = dietFilter.value;
+      
+      const filtered = this.currentRecipes.filter(recipe => {
+        if (filterValue === 'Veg') return isVegRecipe(recipe);
+        if (filterValue === 'Non-Veg') return !isVegRecipe(recipe);
+        return true;
+      });
+
+      filtered.forEach((recipe, idx) => {
+        const li = document.createElement('li');
+        li.className = 'recipe-item';
+        li.style.animationDelay = `${idx * 0.1}s`;
+        li.innerHTML = `
+          <span class="recipe-num">0${idx + 1}</span>
+          <span class="recipe-name">${recipe}</span>
+          <button class="get-recipe-btn" data-recipe="${recipe}">Get Recipe</button>
+        `;
+        recipesList.appendChild(li);
+      });
+
+      // Add event listeners to the buttons
+      const buttons = recipesList.querySelectorAll('.get-recipe-btn');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const recipeName = (e.currentTarget as HTMLButtonElement).getAttribute('data-recipe') || '';
+          detailsTitle.textContent = `${recipeName} Details`;
+          detailsContent.textContent = 'Fetching recipe instructions...';
+          detailsSection.style.display = 'block';
+
+          try {
+            const details = await this.service.getRecipeDetails(recipeName);
+            detailsContent.textContent = details;
+          } catch (err) {
+            detailsContent.textContent = 'Failed to load recipe details. Please try again.';
+          }
+        });
+      });
+    };
+
+    dietFilter.addEventListener('change', () => {
+      renderRecipes();
+    });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -149,41 +215,13 @@ export class IndianRecipeGeneratorApp {
       detailsSection.style.display = 'none';
 
       try {
-        const recipes = await this.service.getRecipes(query);
+        this.currentRecipes = await this.service.getRecipes(query);
+        dietFilter.value = 'All'; // Reset filter on new search
         
         statusMsg.style.display = 'none';
         resultsSection.style.display = 'block';
         
-        recipes.forEach((recipe, idx) => {
-          const li = document.createElement('li');
-          li.className = 'recipe-item';
-          li.style.animationDelay = `${idx * 0.1}s`;
-          li.innerHTML = `
-            <span class="recipe-num">0${idx + 1}</span>
-            <span class="recipe-name">${recipe}</span>
-            <button class="get-recipe-btn" data-recipe="${recipe}">Get Recipe</button>
-          `;
-          recipesList.appendChild(li);
-        });
-
-        // Add event listeners to the buttons
-        const buttons = recipesList.querySelectorAll('.get-recipe-btn');
-        buttons.forEach(btn => {
-          btn.addEventListener('click', async (e) => {
-            const recipeName = (e.currentTarget as HTMLButtonElement).getAttribute('data-recipe') || '';
-            detailsTitle.textContent = `${recipeName} Details`;
-            detailsContent.textContent = 'Fetching recipe instructions...';
-            detailsSection.style.display = 'block';
-
-            try {
-              const details = await this.service.getRecipeDetails(recipeName);
-              detailsContent.textContent = details;
-            } catch (err) {
-              detailsContent.textContent = 'Failed to load recipe details. Please try again.';
-            }
-          });
-        });
-
+        renderRecipes();
       } catch (error) {
         statusMsg.className = 'status-message error';
         statusMsg.textContent = 'Oops! Failed to retrieve recipes. Please try again.';
