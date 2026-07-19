@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import fc from 'fast-check';
-import { parseAndValidateRecipes } from './recipe-generator';
+import { parseAndValidateRecipes, MockRecipeService } from './recipe-generator';
 
 describe('Recipe Generator Properties', () => {
   test('round-trip property for valid string arrays', () => {
@@ -33,6 +33,20 @@ describe('Recipe Generator Properties', () => {
         }),
         (invalidJson) => {
           expect(() => parseAndValidateRecipes(invalidJson)).toThrow();
+        }
+      )
+    );
+  });
+
+  test('MockRecipeService.getRecipeDetails always returns a non-empty string', async () => {
+    const service = new MockRecipeService();
+    await fc.assert(
+      fc.asyncProperty(
+        fc.string(),
+        async (recipeName) => {
+          const details = await service.getRecipeDetails(recipeName);
+          expect(typeof details).toBe('string');
+          expect(details.length).toBeGreaterThan(0);
         }
       )
     );

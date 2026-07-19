@@ -132,6 +132,16 @@ describe('MockRecipeService', () => {
     const result = await service.getRecipeDetails('Palak Paneer');
     expect(result).toContain('Paneer, Spinach');
   });
+
+  test('returns Aloo Jeera details', async () => {
+    const result = await service.getRecipeDetails('Aloo Jeera');
+    expect(result).toContain('Potatoes, Cumin');
+  });
+
+  test('returns fallback details for other recipes', async () => {
+    const result = await service.getRecipeDetails('Matar Paneer');
+    expect(result).toContain('Ingredients and instructions for mock Matar Paneer');
+  });
 });
 
 describe('IndianRecipeGeneratorApp', () => {

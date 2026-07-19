@@ -24,24 +24,7 @@ export class GeminiRecipeService implements RecipeService {
     this.model = model;
   }
 
-  async getRecipes(query: string): Promise<string[]> {
-    const prompt = `Generate exactly 5 authentic Indian recipe names (and only the names) that use or are related to: "${query}". Return the names as a JSON array of strings, for example: ["Aloo Jeera", "Aloo Gobi", "Aloo Paratha", "Dum Aloo", "Aloo Methi"]. Do not include backticks, markdown formatting, or any extra text.`;
-    
-    try {
-      const response = await this.ai.models.generateContent({
-        model: this.model,
-        contents: prompt,
-      });
-
-      return parseAndValidateRecipes(response.text || '');
-    } catch (error) {
-      console.error('Gemini service error:', error);
-      throw error;
-    }
-  }
-
-  async getRecipeDetails(recipeName: string): Promise<string> {
-    const prompt = `Provide a brief ingredients and instructions summary for the Indian recipe "${recipeName}". Keep it concise and return only the text summary.`;
+  private async generate(prompt: string): Promise<string> {
     try {
       const response = await this.ai.models.generateContent({
         model: this.model,
@@ -52,6 +35,17 @@ export class GeminiRecipeService implements RecipeService {
       console.error('Gemini service error:', error);
       throw error;
     }
+  }
+
+  async getRecipes(query: string): Promise<string[]> {
+    const prompt = `Generate exactly 5 authentic Indian recipe names (and only the names) that use or are related to: "${query}". Return the names as a JSON array of strings, for example: ["Aloo Jeera", "Aloo Gobi", "Aloo Paratha", "Dum Aloo", "Aloo Methi"]. Do not include backticks, markdown formatting, or any extra text.`;
+    const text = await this.generate(prompt);
+    return parseAndValidateRecipes(text);
+  }
+
+  async getRecipeDetails(recipeName: string): Promise<string> {
+    const prompt = `Provide a brief ingredients and instructions summary for the Indian recipe "${recipeName}". Keep it concise and return only the text summary.`;
+    return this.generate(prompt);
   }
 }
 
