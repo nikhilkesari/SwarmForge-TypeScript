@@ -5,3 +5,11 @@
 .worktrees/
 swarmforge/scripts/
 node_modules
+bak.env
+.stryker-tmp/
+build/
+dist/
+reports/
+tmp/
+test-results/
+--help/
