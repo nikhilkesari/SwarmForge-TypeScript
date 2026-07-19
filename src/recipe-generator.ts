@@ -2,6 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 
 export interface RecipeService {
   getRecipes(query: string): Promise<string[]>;
+  getRecipeDetails(recipeName: string): Promise<string>;
 }
 
 export function parseAndValidateRecipes(text: string): string[] {
@@ -38,6 +39,20 @@ export class GeminiRecipeService implements RecipeService {
       throw error;
     }
   }
+
+  async getRecipeDetails(recipeName: string): Promise<string> {
+    const prompt = `Provide a brief ingredients and instructions summary for the Indian recipe "${recipeName}". Keep it concise and return only the text summary.`;
+    try {
+      const response = await this.ai.models.generateContent({
+        model: this.model,
+        contents: prompt,
+      });
+      return response.text || '';
+    } catch (error) {
+      console.error('Gemini service error:', error);
+      throw error;
+    }
+  }
 }
 
 // A mock service for testing, and as a fallback if no API key is provided
@@ -51,6 +66,16 @@ export class MockRecipeService implements RecipeService {
     }
     // Fallback Indian recipes
     return ['Butter Chicken', 'Chana Masala', 'Biryani', 'Dal Makhani', 'Samosa'];
+  }
+
+  async getRecipeDetails(recipeName: string): Promise<string> {
+    if (recipeName === 'Palak Paneer') {
+      return "Ingredients: Paneer, Spinach, Spices. Instructions: Cook spinach, add paneer cubes, and simmer.";
+    }
+    if (recipeName === 'Aloo Jeera') {
+      return "Ingredients: Potatoes, Cumin, Spices. Instructions: Boil potatoes, temper cumin, toss, and serve hot.";
+    }
+    return `Ingredients and instructions for mock ${recipeName}`;
   }
 }
 
@@ -94,6 +119,11 @@ export class IndianRecipeGeneratorApp {
             <h2>Your Recipes</h2>
             <ul id="recipes-list"></ul>
           </div>
+
+          <div id="recipe-details-section" class="status-message info" style="display: none; margin-top: 20px; text-align: left;">
+            <h3 id="recipe-details-title" style="margin-top: 0;"></h3>
+            <p id="recipe-details-content" style="margin-bottom: 0;"></p>
+          </div>
         </main>
       </div>
     `;
@@ -105,6 +135,9 @@ export class IndianRecipeGeneratorApp {
     const statusMsg = this.container.querySelector('#status-message') as HTMLElement;
     const resultsSection = this.container.querySelector('#results-section') as HTMLElement;
     const recipesList = this.container.querySelector('#recipes-list') as HTMLUListElement;
+    const detailsSection = this.container.querySelector('#recipe-details-section') as HTMLElement;
+    const detailsTitle = this.container.querySelector('#recipe-details-title') as HTMLElement;
+    const detailsContent = this.container.querySelector('#recipe-details-content') as HTMLElement;
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -119,6 +152,7 @@ export class IndianRecipeGeneratorApp {
       statusMsg.textContent = 'Consulting the culinary oracle...';
       resultsSection.style.display = 'none';
       recipesList.innerHTML = '';
+      detailsSection.style.display = 'none';
 
       try {
         const recipes = await this.service.getRecipes(query);
@@ -133,9 +167,29 @@ export class IndianRecipeGeneratorApp {
           li.innerHTML = `
             <span class="recipe-num">0${idx + 1}</span>
             <span class="recipe-name">${recipe}</span>
+            <button class="get-recipe-btn" data-recipe="${recipe}">Get Recipe</button>
           `;
           recipesList.appendChild(li);
         });
+
+        // Add event listeners to the buttons
+        const buttons = recipesList.querySelectorAll('.get-recipe-btn');
+        buttons.forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const recipeName = (e.currentTarget as HTMLButtonElement).getAttribute('data-recipe') || '';
+            detailsTitle.textContent = `${recipeName} Details`;
+            detailsContent.textContent = 'Fetching recipe instructions...';
+            detailsSection.style.display = 'block';
+
+            try {
+              const details = await this.service.getRecipeDetails(recipeName);
+              detailsContent.textContent = details;
+            } catch (err) {
+              detailsContent.textContent = 'Failed to load recipe details. Please try again.';
+            }
+          });
+        });
+
       } catch (error) {
         statusMsg.className = 'status-message error';
         statusMsg.textContent = 'Oops! Failed to retrieve recipes. Please try again.';

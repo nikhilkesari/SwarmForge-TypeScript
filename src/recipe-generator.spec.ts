@@ -95,6 +95,16 @@ describe('GeminiRecipeService', () => {
     expect(consoleErrorSpy).toHaveBeenCalled();
     consoleErrorSpy.mockRestore();
   });
+
+  test('calls generateContent and returns recipe details', async () => {
+    const service = new GeminiRecipeService('dummy-key');
+    const clientInstance = (service as any).ai;
+    clientInstance.models.generateContent.mockResolvedValueOnce({
+      text: 'Instructions for recipe'
+    });
+    const result = await service.getRecipeDetails('Palak Paneer');
+    expect(result).toBe('Instructions for recipe');
+  });
 });
 
 describe('MockRecipeService', () => {
@@ -116,6 +126,11 @@ describe('MockRecipeService', () => {
     const results = await service.getRecipes('chicken');
     expect(results).toContain('Butter Chicken');
     expect(results.length).toBe(5);
+  });
+
+  test('returns Palak Paneer details', async () => {
+    const result = await service.getRecipeDetails('Palak Paneer');
+    expect(result).toContain('Paneer, Spinach');
   });
 });
 
@@ -156,5 +171,29 @@ describe('IndianRecipeGeneratorApp', () => {
     const recipeItems = container.querySelectorAll('#recipes-list .recipe-item .recipe-name');
     expect(recipeItems.length).toBe(5);
     expect(recipeItems[0].textContent).toBe('Palak Paneer');
+  });
+
+  test('handles Get Recipe button click and displays details', async () => {
+    const service = new MockRecipeService();
+    const app = new IndianRecipeGeneratorApp(container, service);
+    app.init();
+
+    const form = container.querySelector('#search-form') as HTMLFormElement;
+    const input = container.querySelector('#search-input') as HTMLInputElement;
+
+    input.value = 'paneer, spinach';
+    const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+    form.dispatchEvent(submitEvent);
+
+    await new Promise((resolve) => setTimeout(resolve, 60));
+
+    const btn = container.querySelector('.get-recipe-btn') as HTMLButtonElement;
+    expect(btn).toBeDefined();
+    btn.click();
+
+    await new Promise((resolve) => setTimeout(resolve, 60));
+
+    const content = container.querySelector('#recipe-details-content') as HTMLElement;
+    expect(content.textContent).toContain('Paneer, Spinach');
   });
 });

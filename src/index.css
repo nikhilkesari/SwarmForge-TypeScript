@@ -274,3 +274,22 @@ button:disabled {
     transform: translateY(0);
   }
 }
+
+.get-recipe-btn {
+  margin-left: auto;
+  background: rgba(179, 136, 255, 0.1);
+  border: 1px solid rgba(179, 136, 255, 0.3);
+  color: #b388ff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.get-recipe-btn:hover {
+  background: #b388ff;
+  color: #121212;
+  box-shadow: 0 0 8px rgba(179, 136, 255, 0.4);
+}
+

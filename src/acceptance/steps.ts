@@ -20,6 +20,11 @@ export function registerSteps(runtime: AcceptanceRuntime) {
         world.calledService = true;
         world.serviceQuery = query;
         return mockService.getRecipes(query);
+      },
+      getRecipeDetails: async (recipeName: string) => {
+        world.calledDetails = true;
+        world.detailsRecipe = recipeName;
+        return mockService.getRecipeDetails(recipeName);
       }
     };
 
@@ -78,5 +83,26 @@ export function registerSteps(runtime: AcceptanceRuntime) {
     // Basic validation: the recipes returned in our mock are all Indian
     const recipeItems = world.container.querySelectorAll('#recipes-list .recipe-item .recipe-name');
     expect(recipeItems.length).toBeGreaterThan(0);
+  });
+
+  runtime.defineStep(/^the user clicks "Get Recipe" for <([A-Za-z0-9_]+)>$/, async (world, example, paramName) => {
+    const recipeName = example[paramName].replace(/^"|"$/g, '');
+    const btn = world.container.querySelector(`.get-recipe-btn[data-recipe="${recipeName}"]`) as HTMLButtonElement;
+    expect(btn).toBeDefined();
+    btn.click();
+    // Wait for details fetch to resolve
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  });
+
+  runtime.defineStep(/^the application calls the Google Gen AI SDK to fetch details for <([A-Za-z0-9_]+)>$/, (world, example, paramName) => {
+    const recipeName = example[paramName].replace(/^"|"$/g, '');
+    expect(world.calledDetails).toBe(true);
+    expect(world.detailsRecipe).toBe(recipeName);
+  });
+
+  runtime.defineStep(/^the application displays the details: <([A-Za-z0-9_]+)>$/, (world, example, paramName) => {
+    const expectedDetails = example[paramName].replace(/^"|"$/g, '');
+    const content = world.container.querySelector('#recipe-details-content') as HTMLElement;
+    expect(content.textContent).toBe(expectedDetails);
   });
 }

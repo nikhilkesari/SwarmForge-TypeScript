@@ -25,5 +25,15 @@ test.describe('Indian Recipe Generator UI', () => {
 
     // 7. Verify the first recipe contains Palak Paneer
     await expect(recipeItems.first()).toContainText('Palak Paneer');
+
+    // 8. Click the "Get Recipe" button for the first recipe
+    const getRecipeBtn = recipeItems.first().locator('.get-recipe-btn');
+    await getRecipeBtn.click();
+
+    // 9. Verify the details section is displayed with the correct content
+    const detailsSection = page.locator('#recipe-details-section');
+    await expect(detailsSection).toBeVisible();
+    await expect(page.locator('#recipe-details-title')).toHaveText('Palak Paneer Details');
+    await expect(page.locator('#recipe-details-content')).toContainText('Paneer, Spinach');
   });
 });
