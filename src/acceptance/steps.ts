@@ -1,6 +1,8 @@
 import { expect } from 'vitest';
 import { AcceptanceRuntime } from './runtime';
-import { IndianRecipeGeneratorApp, MockRecipeService, RecipeService } from '../recipe-generator';
+import { IndianRecipeGeneratorApp } from '../recipe-generator';
+import { RecipeService } from '../recipe-service';
+import { MockRecipeService } from '../mock-recipe-service';
 
 export function registerSteps(runtime: AcceptanceRuntime) {
   runtime.defineStep('the Indian Recipe Generator application is loaded', (world) => {

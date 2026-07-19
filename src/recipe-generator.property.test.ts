@@ -1,6 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import fc from 'fast-check';
-import { parseAndValidateRecipes, MockRecipeService } from './recipe-generator';
+import { parseAndValidateRecipes } from './recipe-service';
+import { MockRecipeService } from './mock-recipe-service';
 
 describe('Recipe Generator Properties', () => {
   test('round-trip property for valid string arrays', () => {
