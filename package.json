@@ -9,14 +9,20 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:acceptance": "ts-node-esm scripts/run-acceptance.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:property": "vitest run -c vite.config.property.ts"
   },
   "dependencies": {
     "@google/genai": "^0.2.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0",
+    "@stryker-mutator/core": "^9.6.1",
     "@types/node": "^20.11.0",
+    "@vitest/coverage-v8": "^1.6.1",
+    "crap4ts": "^1.0.1",
+    "dry4ts": "^0.2.0",
+    "fast-check": "^4.9.0",
     "jsdom": "^24.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3",

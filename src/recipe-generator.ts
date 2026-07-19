@@ -4,6 +4,16 @@ export interface RecipeService {
   getRecipes(query: string): Promise<string[]>;
 }
 
+export function parseAndValidateRecipes(text: string): string[] {
+  const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
+  const parsed = JSON.parse(cleanJson);
+  
+  if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
+    return parsed.slice(0, 5);
+  }
+  throw new Error('Invalid response structure from Gemini API');
+}
+
 export class GeminiRecipeService implements RecipeService {
   private ai: GoogleGenAI;
   private model: string;
@@ -22,15 +32,7 @@ export class GeminiRecipeService implements RecipeService {
         contents: prompt,
       });
 
-      const text = response.text || '';
-      // Strip markdown code blocks if returned
-      const cleanJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
-      const parsed = JSON.parse(cleanJson);
-      
-      if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
-        return parsed.slice(0, 5);
-      }
-      throw new Error('Invalid response structure from Gemini API');
+      return parseAndValidateRecipes(response.text || '');
     } catch (error) {
       console.error('Gemini service error:', error);
       throw error;

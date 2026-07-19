@@ -23,7 +23,7 @@ function main() {
 
     // 4. Run the generated tests using Vitest
     console.log('--- Running Vitest Acceptance Tests ---');
-    runCmd('npx vitest run src/acceptance');
+    runCmd('npx vitest run -c vite.config.acceptance.ts');
 
     console.log('Acceptance tests passed successfully.');
     process.exit(0);
