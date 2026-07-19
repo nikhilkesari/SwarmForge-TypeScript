@@ -1,0 +1,13 @@
+{
+  "threshold": 5,
+  "minLines": 4,
+  "minTokens": 20,
+  "ignore": [
+    "**/node_modules/**",
+    "**/build/**",
+    "**/coverage/**",
+    "**/test-results/**",
+    "**/tmp/**"
+  ],
+  "absolute": true
+}

@@ -10,7 +10,8 @@
     "test:watch": "vitest",
     "test:acceptance": "ts-node-esm scripts/run-acceptance.ts",
     "test:e2e": "playwright test",
-    "test:property": "vitest run -c vite.config.property.ts"
+    "test:property": "vitest run -c vite.config.property.ts",
+    "test:dry": "jscpd src"
   },
   "dependencies": {
     "@google/genai": "^0.2.0"
@@ -23,6 +24,7 @@
     "crap4ts": "^1.0.1",
     "dry4ts": "^0.2.0",
     "fast-check": "^4.9.0",
+    "jscpd": "^5.0.12",
     "jsdom": "^24.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
