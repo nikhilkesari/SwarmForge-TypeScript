@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "feature_path": "features/recipe_generator.feature",
+  "ir_path": "tmp/recipe_generator.json",
+  "implementation_hash": "sha256:b0b81706b2c672e4e9515d0190e2ee1d2dc4341923f0169dc2a055744be57ed0",
+  "hash_scope": "generated_files",
+  "generated_files": [
+    "src/acceptance/recipe_generator.spec.ts"
+  ]
+}
