@@ -43,11 +43,10 @@ export class GeminiRecipeService implements RecipeService {
 // A mock service for testing, and as a fallback if no API key is provided
 export class MockRecipeService implements RecipeService {
   async getRecipes(query: string): Promise<string[]> {
-    const lower = query.toLowerCase();
-    if (lower.includes('paneer') || lower.includes('spinach')) {
+    if (query === 'paneer, spinach') {
       return ['Palak Paneer', 'Paneer Tikka', 'Paneer Bhurji', 'Kadai Paneer', 'Matar Paneer'];
     }
-    if (lower.includes('potato') || lower.includes('cumin')) {
+    if (query === 'potato, cumin') {
       return ['Aloo Jeera', 'Aloo Gobi', 'Aloo Paratha', 'Dum Aloo', 'Aloo Methi'];
     }
     // Fallback Indian recipes

@@ -101,13 +101,13 @@ describe('MockRecipeService', () => {
   const service = new MockRecipeService();
 
   test('returns paneer recipes when query contains paneer', async () => {
-    const results = await service.getRecipes('paneer');
+    const results = await service.getRecipes('paneer, spinach');
     expect(results).toContain('Palak Paneer');
     expect(results.length).toBe(5);
   });
 
   test('returns potato recipes when query contains potato', async () => {
-    const results = await service.getRecipes('potato');
+    const results = await service.getRecipes('potato, cumin');
     expect(results).toContain('Aloo Jeera');
     expect(results.length).toBe(5);
   });
@@ -145,7 +145,7 @@ describe('IndianRecipeGeneratorApp', () => {
     const form = container.querySelector('#search-form') as HTMLFormElement;
     const input = container.querySelector('#search-input') as HTMLInputElement;
 
-    input.value = 'paneer';
+    input.value = 'paneer, spinach';
     
     const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
     form.dispatchEvent(submitEvent);
