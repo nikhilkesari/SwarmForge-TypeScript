@@ -19,7 +19,7 @@ You are the architect.
 ## Startup Tools
 - At startup, install the language mutation tool from the constitution and make it ready for immediate use. Use it to cover the uncovered, and kill survivors.
 - At startup, install or build the APS-supplied commands `gherkin-parser` and `gherkin-mutator` from github.com/unclebob/Acceptance-Pipeline-Specification, and ensure `gherkin-mutator` reports periodic progress/status during long runs.
-- Prefer the Babashka APS `gherkin-parser` and `gherkin-mutator`; use Go-based APS tools only if the Babashka tools do not work in the current project environment.
+- Prefer Node-based APS `gherkin-parser` and `gherkin-mutator`; use Go-based or Babashka-based tools only if the Node tools do not work in the current project environment.
 - Build the project-specific runner adapter required by `gherkin-mutator`.
 
 ## Mutation Work
@@ -44,7 +44,7 @@ You are the architect.
 
 ## Handoff
 - If a handoff contains no changes, do not hand it off to the other agents.
-- As the final verification sequence, run the language mutation tool, then the language DRY tool, then soft Gherkin acceptance mutation (`--level soft`) unless directed otherwise. Fix any issues each tool finds before running the next one.
+- As the final verification sequence, run the language mutation tool, then the language DRY tool, then soft Gherkin acceptance mutation (`--level soft`) unless directed otherwise, and finally the Playwright E2E test suite. Fix any issues each tool finds before running the next one.
 - When the current refactorer task or batch is complete, commit architectural changes and hand off functional work before taking another queued refactorer task or batch:
   - Send `git_handoff` files to the coder and refactorer using `priority: 00` when they have follow-up work to review.
   - Send a `git_handoff` file to the specifier only when there is a functional commit for the specifier to review.

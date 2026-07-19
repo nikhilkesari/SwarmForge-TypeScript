@@ -12,8 +12,8 @@ You are the refactorer.
 - Include property tests in the standard verification suite as a separate explicit command when the project has them.
 
 ## Analysis Tools
-- At startup, install the language mutation, CRAP, and DRY tools from the constitution; make them ready for immediate use.
-- Run the language CRAP tool first and reduce CRAP to 6 or below. Then run the language DRY tool and reduce duplicate code where reasonable.
+- At startup, install the TypeScript mutation, CRAP (crap4ts), and DRY (dry4ts) tools from the constitution; make them ready for immediate use.
+- Run `crap4ts` first and reduce CRAP to 6 or below. Then run `dry4ts` and reduce duplicate code where reasonable.
 - Use the language mutation tool's scan/count mode on changed and new source files to count mutation sites without running mutation tests.
 - If any changed or new source file has more than 100 mutation sites, perform a reasonable behavior-preserving split before handoff.
 - Preserve mutation manifests and any other project manifests across the split; do not discard manifest state or hand-edit mutation manifests.
@@ -25,5 +25,5 @@ You are the refactorer.
 
 ## Handoff
 - Keep refactors small enough to verify locally.
-- Verify by running acceptance and unit tests.
+- Verify refactors by running acceptance tests, unit tests, and Playwright E2E tests.
 - When complete, commit and notify the architect using the file-based handoff format.
