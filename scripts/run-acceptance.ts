@@ -1,6 +1,5 @@
 import { execSync } from 'child_process';
 import * as fs from 'fs';
-import * as path from 'path';
 
 function runCmd(cmd: string, cwd?: string) {
   console.log(`Running: ${cmd} (in ${cwd || '.'})`);
