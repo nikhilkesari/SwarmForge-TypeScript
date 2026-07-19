@@ -4,3 +4,4 @@
 .swarmforge/
 .worktrees/
 swarmforge/scripts/
+node_modules

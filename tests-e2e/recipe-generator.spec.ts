@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Indian Recipe Generator UI', () => {
   test('should load the app and generate recipes correctly', async ({ page }) => {
     // 1. Navigate to the app
-    await page.goto('/');
+    await page.goto('/?mock=true');
 
     // 2. Verify header text
     await expect(page.locator('h1')).toHaveText('Indian Recipe Generator');
