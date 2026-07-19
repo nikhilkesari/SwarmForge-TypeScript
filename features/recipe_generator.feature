@@ -26,3 +26,17 @@ Feature: Indian Recipe Generator
       | query             | recipes                                                                                |
       | "paneer, spinach" | "Palak Paneer, Paneer Tikka, Paneer Bhurji, Kadai Paneer, Matar Paneer"                |
       | "potato, cumin"   | "Aloo Jeera, Aloo Gobi, Aloo Paratha, Dum Aloo, Aloo Methi"                            |
+
+  # Scenario: recipe_generator_2
+  Scenario Outline: Get details for a specific recipe
+    When the user enters the search query <query>
+    And the user submits the query
+    Then the application displays exactly 5 recipes: <recipes>
+    When the user clicks "Get Recipe" for <recipe_name>
+    Then the application calls the Google Gen AI SDK to fetch details for <recipe_name>
+    And the application displays the details: <details>
+
+    Examples:
+      | query             | recipes                                                                                | recipe_name    | details                                                                                                  |
+      | "paneer, spinach" | "Palak Paneer, Paneer Tikka, Paneer Bhurji, Kadai Paneer, Matar Paneer"                | "Palak Paneer" | "Ingredients: Paneer, Spinach, Spices. Instructions: Cook spinach, add paneer cubes, and simmer."        |
+      | "potato, cumin"   | "Aloo Jeera, Aloo Gobi, Aloo Paratha, Dum Aloo, Aloo Methi"                            | "Aloo Jeera"   | "Ingredients: Potatoes, Cumin, Spices. Instructions: Boil potatoes, temper cumin, toss, and serve hot." |
