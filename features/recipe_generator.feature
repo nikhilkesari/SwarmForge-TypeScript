@@ -1,6 +1,6 @@
-# mutation-stamp: sha256=7bd52217f8bc6787aeacd493de6ca432d1c23af0343d67cf72c641f8ea4e926a
+# mutation-stamp: sha256=2ba3ece83f0609ee9fa0acd8c7bb4029068ea5fecc69bdfbc6aefcd6ac99594f
 # acceptance-mutation-manifest-begin
-# {"version":1,"tested_at":"2026-07-19T10:34:10.478909Z","feature_name":"Indian Recipe Generator","feature_path":"features/recipe_generator.feature","background_hash":"cc5f0ff28380dd52820b6423456566f916f796018da886f9ffdcd22d1b9bdefc","implementation_hash":"sha256:b0b81706b2c672e4e9515d0190e2ee1d2dc4341923f0169dc2a055744be57ed0","scenarios":[{"index":0,"name":"Generate 5 Indian recipes from ingredient input","scenario_hash":"e43a9dd1dd0bc9293a53ee0dd9cb9a40efa1c7f716035c62a6a7ab10abbcaba0","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-07-19T10:34:10.478909Z"}]}
+# {"version":1,"tested_at":"2026-07-19T10:42:12.176274Z","feature_name":"Indian Recipe Generator","feature_path":"features/recipe_generator.feature","background_hash":"cc5f0ff28380dd52820b6423456566f916f796018da886f9ffdcd22d1b9bdefc","implementation_hash":"sha256:b0b81706b2c672e4e9515d0190e2ee1d2dc4341923f0169dc2a055744be57ed0","scenarios":[{"index":1,"name":"Get details for a specific recipe","scenario_hash":"9df5b2c9ac7d2d67c735c5ffe1b8bdfc6ef9443e700c1afafaeb00b53b0e79c4","mutation_count":8,"result":{"Total":8,"Killed":8,"Survived":0,"Errors":0},"tested_at":"2026-07-19T10:42:12.176274Z"},{"index":0,"name":"Generate 5 Indian recipes from ingredient input","scenario_hash":"e43a9dd1dd0bc9293a53ee0dd9cb9a40efa1c7f716035c62a6a7ab10abbcaba0","mutation_count":4,"result":{"Total":4,"Killed":4,"Survived":0,"Errors":0},"tested_at":"2026-07-19T10:34:10.478909Z"}]}
 # acceptance-mutation-manifest-end
 
 # Feature: Recipe Generator
