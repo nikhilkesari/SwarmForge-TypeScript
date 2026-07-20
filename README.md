@@ -1,28 +1,56 @@
 # Generator & SwarmForge Workspace 🍲🤖
 
-An AI-powered web application that generates authentic Indian recipes based on ingredients and dietary preferences, serving as a playground for the **SwarmForge multi-agent development workflow**.
+This repository is a **SwarmForge** playground configured to run a multi-agent development workflow tailored for **TypeScript projects**. The primary purpose of this workspace is to showcase how a collaborative team of AI agents can autonomously develop features, refactor code, and maintain architectural integrity guided by a strict quality harness.
+
+> [!NOTE]
+> The **Indian Recipe Generator** single-page application under `src/` is **simply a target application** to demonstrate this agentic development pipeline. The core focus of this repository is the agent pipeline configuration, prompt roles, and the verification harness.
 
 ---
 
-## 🤖 SwarmForge Multi-Agent Workspace
+## 🤖 SwarmForge Multi-Agent Workflow
 
-This repository is inspired by **[SwarmForge](https://github.com/unclebob/swarm-forge)**, a collaborative multi-agent developer system by **Robert C. Martin (Uncle Bob)**. 
+Inspired by **[SwarmForge](https://github.com/unclebob/swarm-forge)**—a collaborative multi-agent developer system by **Robert C. Martin (Uncle Bob)**—this workflow orchestrates four specialized developer agents to implement code changes collaboratively:
 
-This agent flow is customized specifically for **TypeScript projects**, orchestrating four distinct developer roles to coordinate, implement, and refine code in a structured cycle:
+1. **Specifier (`specifier`)**: Takes user intents and designs precise Gherkin/Cucumber behavior scenarios under the `features/` directory.
+2. **Coder (`coder`)**: Translates approved specifications into TypeScript code using Test-Driven Development (TDD) principles.
+3. **Refactorer (`refactorer`)**: Optimizes the coder's implementation (improving readability, eliminating duplicate blocks, and reducing complexity metrics).
+4. **Architect (`architect`)**: Reviews module boundaries, executes rigorous verification checks (mutation testing, duplication audits), and manages commits across worktrees.
 
-*   **Specifier (`specifier`)**: Analyzes requirements and drafts Gherkin/Cucumber specification scenarios under the `features/` directory.
-*   **Coder (`coder`)**: Writes the TypeScript code implementation to satisfy the specifications.
-*   **Refactorer (`refactorer`)**: Audits the code structure, improves styling, and cleans up technical debt.
-*   **Architect (`architect`)**: Governs the codebase structure, processes work in batches, and ensures overall architectural integrity across worktrees.
+---
 
-### Executing SwarmForge
+## 🚀 How to Add New Features Using SwarmForge
 
-The workspace features a `./swarm` wrapper script that bootstraps and runs the agent pipeline according to the [swarmforge/swarmforge.conf](swarmforge/swarmforge.conf) configuration.
+You can develop and extend the application by instructing the agent pipeline to build new features on top of the existing UI and codebase:
 
-To run SwarmForge agent tasks:
+### 1. Start the Swarm Daemon
+Launch the tmux-based SwarmForge orchestrator:
 ```bash
-./swarm <command>
+./swarm
 ```
+This boots tmux sessions for each agent role (`specifier`, `coder`, `refactorer`, `architect`) and starts monitoring the handoff directories.
+
+### 2. Write and Send a Feature Request
+Create a draft text file (e.g., `add-favorites-feature.txt`) describing the user intent or feature you want to build on top of the UI (e.g., adding a "Favorite Recipe" button):
+```rfc822
+to: specifier
+type: note
+priority: 50
+message: Add a 'Favorite' button to each recipe item and display the list of saved favorites below the details.
+```
+
+Submit this draft to the swarm inbox:
+```bash
+./swarmforge/scripts/swarm_handoff.sh add-favorites-feature.txt
+```
+
+### 3. Review and Approve Specifications
+The **Specifier** agent consumes this task, writes a Gherkin specification (under `features/`), and presents the draft specifications. Once you review and approve, the specifier commits the specification and hands the task over to the **Coder**.
+
+### 4. Automated Development & Verification
+Once the specification is approved, the remaining agent flow proceeds autonomously:
+1. **Coder** implements the code in a dedicated worktree and writes unit tests.
+2. **Refactorer** ensures code meets clean code guidelines and reduces complexity.
+3. **Architect** runs the complete verification suite, merges the code back to the main branch, and signals completion.
 
 ---
 
@@ -92,7 +120,7 @@ To maintain DRY (Don't Repeat Yourself) design principles, the `jscpd` tool is r
 
 ---
 
-## 🍲 Indian Recipe Generator App
+## 🍲 Target Application: Indian Recipe Generator
 
 The project application is a responsive, single-page web app that interacts with the Gemini API to fetch recipe suggestions and steps dynamically.
 
